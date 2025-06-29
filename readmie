@@ -1,0 +1,20 @@
+docker restart snp-dwh-airflow-webserver-1 snp-dwh-airflow-scheduler-1
+docker exec -it snp-dwh-airflow-webserver-1 bash
+ docker exec -it snp-dwh-airflow-scheduler-1 bash
+
+
+ spark-submit   --master spark://snp-dwh-spark-master-1:7077   /var/snp-dwh/spark_jobs/mi_script.py
+docker exec -it snp-dwh-airflow-webserver-1 airflow db init
+
+
+
+airflow 
+
+#!/bin/bash
+docker cp /var/snp-dwh/sftp/sftp-data/usuarios.csv snp-dwh-hadoop-namenode-1:/tmp/usuarios.csv
+docker exec snp-dwh-hadoop-namenode-1 hdfs dfs -mkdir -p /data
+docker exec snp-dwh-hadoop-namenode-1 hdfs dfs -put -f /tmp/usuarios.csv /data/
+rm /var/snp-dwh/sftp/sftp-data/usuarios.csv
+
+
+chmod +x /var/snp-dwh/scripts/upload_to_hdfs.sh
