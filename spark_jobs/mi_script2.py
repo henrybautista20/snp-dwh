@@ -31,7 +31,7 @@ df.show()
 # Escribir en PostgreSQL
 df.write \
     .format("jdbc") \
-    .option("url", "jdbc:postgresql://postgres:5432/airflow") \
+    .option("url", "jdbc:postgresql://postgres:5432/usuario_db") \
     .option("dbtable", "usuario_spark") \
     .option("user", "airflow") \
     .option("password", "airflow") \

@@ -68,7 +68,7 @@ services:
     environment:
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
-      - AIRFLOW__CORE__FERNET_KEY=-v-Ro-QyJ7T-Q3KUEVEcun6_TOvR42nttTYJZNX5xdU=
+      - AIRFLOW__CORE__FERNET_KEY=b3YY6INFS3fOtcW-jfgPi6cjDw8fYkAa5xCARoqQhoY=
       - AIRFLOW__CORE__LOAD_EXAMPLES=True
       - AIRFLOW__DATABASE__SQL_ALCHEMY_POOL_ENABLED=False
     depends_on:
@@ -90,7 +90,7 @@ services:
     environment:
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
-      - AIRFLOW__CORE__FERNET_KEY=-v-Ro-QyJ7T-Q3KUEVEcun6_TOvR42nttTYJZNX5xdU=
+      - AIRFLOW__CORE__FERNET_KEY=b3YY6INFS3fOtcW-jfgPi6cjDw8fYkAa5xCARoqQhoY=
       - AIRFLOW__CORE__LOAD_EXAMPLES=True
       - AIRFLOW__DATABASE__SQL_ALCHEMY_POOL_ENABLED=False
     depends_on:

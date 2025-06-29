@@ -5,7 +5,7 @@ from pyspark.sql import Row
 # Crear sesión de Spark con el conector JDBC
 spark = SparkSession.builder \
     .appName("Insertar usuarios desde Spark") \
-    .config("spark.jars", "/var/snp-dwh/spark_jars/postgresql-42.7.3.jar") \
+    .config("spark.jars", "/var/snp-dwh/postgresql-42.7.3.jar") \
     .getOrCreate()
 
 # Crear datos manualmente

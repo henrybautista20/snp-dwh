@@ -3,8 +3,8 @@ from datetime import datetime
 
 # Datos de conexión
 conexion = psycopg2.connect(
-    host="192.168.1.135",
-    database="usuari_db",
+    host="192.168.1.137",
+    database="usuario_db",
     user="airflow",
     password="airflow",  # Reemplaza con tu contraseña real
     port=5432

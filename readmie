@@ -18,3 +18,48 @@ rm /var/snp-dwh/sftp/sftp-data/usuarios.csv
 
 
 chmod +x /var/snp-dwh/scripts/upload_to_hdfs.sh
+
+# init 
+root@snp-dwh:/var/snp-dwh# python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+corres 
+docker compose up -d airflow-webserver airflow-scheduler
+docker exec -it snp-dwh-airflow-webserver-1 airflow db init
+docker exec -it snp-dwh-airflow-scheduler-1 airflow db init
+
+
+docker exec -it snp-dwh-airflow-webserver-1 airflow users create \
+  --username admin \
+  --password admin \
+  --firstname Admin \
+  --lastname User \
+  --role Admin \
+  --email admin@example.com
+
+anade la connecion spark://snp-dwh-spark-master-1 con el puertp 7077 spark_remote name
+same as: 
+docker exec -it snp-dwh-airflow-webserver-1 airflow connections add \
+  --conn_id spark_remote \
+  --conn_type spark \
+  --conn_host snp-dwh-spark-master-1 \
+  --conn_port 7077
+
+3 descarfa
+wget https://jdbc.postgresql.org/download/postgresql-42.7.3.jar
+docker exec -it snp-dwh-airflow-webserver-1 bash
+mkdir -p /opt/airflow/jars
+
+docker exec -it snp-dwh-airflow-scheduler-1 bash
+mkdir -p /opt/airflow/jars
+
+docker cp postgresql-42.7.3.jar snp-dwh-airflow-webserver-1:/opt/airflow/jars/postgresql-42.7.3.jar
+docker cp postgresql-42.7.3.jar snp-dwh-airflow-scheduler-1:/opt/airflow/jars/postgresql-42.7.3.jar
+pega en /opt/airflow/jars/postgresql-42.7.3.jar
+JAVA en mi lo local
+apt update \
+  && apt install -y --no-install-recommends openjdk-17-jdk-headless ant \
+  && ln -sfn /usr/lib/jvm/java-17-openjdk-amd64 /usr/lib/jvm/java-17-openjdk-arm64 \
+  && apt clean \
+  && rm -rf /var/lib/apt/lists/*
+
+# Configurar JAVA_HOME
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
