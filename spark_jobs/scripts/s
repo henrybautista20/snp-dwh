@@ -1,0 +1,4 @@
+docker cp /var/snp-dwh/sftp/sftp-data/usuarios.xlsx snp-dwh-hadoop-namenode-1:/tmp/usuarios.xlsx
+docker exec snp-dwh-hadoop-namenode-1 hdfs dfs -mkdir -p /data
+docker exec snp-dwh-hadoop-namenode-1 hdfs dfs -put -f /tmp/usuarios.xlsx /data/
+rm /var/snp-dwh/sftp/sftp-data/usuarios.xlsx

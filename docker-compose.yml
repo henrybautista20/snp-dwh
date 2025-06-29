@@ -50,6 +50,7 @@ services:
       - "7077:7077"
     networks:
       - dev-net
+    mem_limit: 3g
 
   spark-worker:
     build: ./spark
@@ -62,6 +63,7 @@ services:
       - "8081:8081"
     networks:
       - dev-net
+    mem_limit: 3g
 
   airflow-webserver:
     build: ./airflow
@@ -82,7 +84,7 @@ services:
       - ./spark_jobs:/opt/airflow/spark_jobs
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
-      - dev-net
+      - dev-net  
     command: webserver
 
   airflow-scheduler:

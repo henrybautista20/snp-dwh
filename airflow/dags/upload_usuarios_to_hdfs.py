@@ -13,7 +13,7 @@ with DAG(
     default_args=default_args,
     schedule_interval=None,  # Manual o lo puedes poner diario, '0 6 * * *'
     catchup=False,
-    description='Copia usuarios.csv desde /sftp-data en el contenedor hadoop-namenode a HDFS /data',
+    description='Copia datos_pnd2425-13-05-2025_n.xlsx desde /sftp-data en el contenedor hadoop-namenode a HDFS /data',
 ) as dag:
 
     create_hdfs_folder = BashOperator(
@@ -23,7 +23,7 @@ with DAG(
 
     upload_csv_to_hdfs = BashOperator(
         task_id='upload_csv_to_hdfs',
-        bash_command='docker exec snp-dwh-hadoop-namenode-1 hdfs dfs -put -f /sftp-data/usuarios.csv /data/',
+        bash_command='docker exec snp-dwh-hadoop-namenode-1 hdfs dfs -put -f /sftp-data/datos_pnd2425-13-05-2025_n.xlsx /data/',
     )
 
     create_hdfs_folder >> upload_csv_to_hdfs

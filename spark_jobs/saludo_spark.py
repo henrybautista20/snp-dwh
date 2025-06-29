@@ -15,7 +15,7 @@ def main():
         .appName("SimplePrintJob") \
         .getOrCreate()
 
-    print("Hola urban desde  PySpark run in a i r flow !")
+    print("Hola  desdeurban desde  PySpark run in a i r flow !")
     spark.stop()
 
 if __name__ == "__main__":

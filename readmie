@@ -4,10 +4,15 @@ docker exec -it snp-dwh-airflow-webserver-1 bash
 
 
  spark-submit   --master spark://snp-dwh-spark-master-1:7077   /var/snp-dwh/spark_jobs/mi_script.py
+
+ spark-submit   --master spark://snp-dwh-spark-master-1:7077 /var/snp-dwh/spark_jobs/scipt_load.py
+ spark-submit --master spark://192.168.1.137:7077 /var/snp-dwh/spark_jobs/saludo_local.py
+
+ spark-submit --master spark://192.168.1.137:7077 /var/snp-dwh/spark_jobs/test.py
 docker exec -it snp-dwh-airflow-webserver-1 airflow db init
 
 
-
+docker exec -it snp-dwh-airflow-webserver-1
 airflow 
 
 #!/bin/bash
@@ -16,6 +21,9 @@ docker exec snp-dwh-hadoop-namenode-1 hdfs dfs -mkdir -p /data
 docker exec snp-dwh-hadoop-namenode-1 hdfs dfs -put -f /tmp/usuarios.csv /data/
 rm /var/snp-dwh/sftp/sftp-data/usuarios.csv
 
+# sark copy
+
+docker cp postgresql-42.7.3.jar snp-dwh-airflow-webserver-1:/opt/airflow/jars/postgresql-42.7.3.jar
 
 chmod +x /var/snp-dwh/scripts/upload_to_hdfs.sh
 
