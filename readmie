@@ -14,7 +14,7 @@ docker exec -it snp-dwh-airflow-webserver-1 airflow db init
 
 docker exec -it snp-dwh-airflow-webserver-1
 airflow 
-
+docker exec -it snp-dwh-spark-master-1
 #!/bin/bash
 docker cp /var/snp-dwh/sftp/sftp-data/usuarios.csv snp-dwh-hadoop-namenode-1:/tmp/usuarios.csv
 docker exec snp-dwh-hadoop-namenode-1 hdfs dfs -mkdir -p /data

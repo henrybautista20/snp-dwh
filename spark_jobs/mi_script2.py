@@ -4,14 +4,14 @@ from pyspark.sql.types import StructType, StructField, StringType
 # Crear sesión de Spark conectada al cluster
 spark = SparkSession.builder \
     .appName("Leer CSV desde HDFS") \
-    .config("spark.jars", "/opt/airflow/jars/postgresql-42.7.3.jar") \
     .getOrCreate()
 
 # Ruta HDFS del archivo
 hdfs_path = "hdfs://hadoop-namenode:8020/data/usuarios.csv"
 
 # Nota: Asegúrate de que el nombre del nodo y el puerto coincidan con tu configuración de HDFS
-# Si estás usando un contenedor, puede que necesites usar la IP del contenedor en
+# Si estás usando un contenedor, puede que necesites usar la IP del contenedor en    jars="/var/snp-dwh/spark_jobs/jars/postgresql-42.7.3.jar" , #",".join(jars),
+
 # hdfs_path = "hdfs://192.168.1.135:8020/data/usuarios.csv" # para uns hot local
 
 # caso de que localhost no funcione.

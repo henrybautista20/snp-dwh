@@ -34,17 +34,18 @@ schema = StructType([
 
 # SparkSession con tus jars locales
 jars = [
-    "/var/snp-dwh/spark-excel_2.12-0.13.7.jar",
-    "/var/snp-dwh/poi-4.1.2.jar",
-    "/var/snp-dwh/poi-ooxml-4.1.2.jar",
-    "/var/snp-dwh/xmlbeans-3.1.0.jar",
-    "/var/snp-dwh/commons-math3-3.6.1.jar",
-    "/var/snp-dwh/ooxml-schemas-1.4.jar",
-    "/var/snp-dwh/postgresql-42.7.3.jar"
+    "/var/snp-dwh/spark_jobs/jars/spark-excel_2.12-0.13.7.jar",
+    "/var/snp-dwh/spark_jobs/jars/poi-4.1.2.jar",
+    "/var/snp-dwh/spark_jobs/jars/poi-ooxml-4.1.2.jar",
+    "/var/snp-dwh/spark_jobs/jars/xmlbeans-3.1.0.jar",
+    "/var/snp-dwh/spark_jobs/jars/commons-math3-3.6.1.jar",
+    "/var/snp-dwh/spark_jobs/jars/ooxml-schemas-1.4.jar",
+    "/var/snp-dwh/spark_jobs/jars/postgresql-42.7.3.jar"
 ]
 
 spark = SparkSession.builder \
     .appName("Leer Indicadores PND24-25") \
+    .master("spark://192.168.1.137:7077")\
     .config("spark.jars", ",".join(jars)) \
     .config("spark.driver.memory", "4g") \
     .config("spark.executor.memory", "4g") \
