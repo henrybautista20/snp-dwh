@@ -1,4 +1,47 @@
 docker cp /var/snp-dwh/sftp/sftp-data/datos_pnd2425-13-05-2025_n.xlsx snp-dwh-hadoop-namenode-1:/tmp/datos_pnd2425-13-05-2025_n.xlsx
 docker exec snp-dwh-hadoop-namenode-1 hdfs dfs -mkdir -p /data
-docker exec snp-dwh-hadoop-namenode-1 hdfs dfs -put -f /tmp/datos_pnd2425-13-05-2025_n.xlsx /data/
+docker exec snp-dwh-h
+
+with DAG(
+    dag_id='load_csv_to_hdfs',
+    default_args=default_args,
+    schedule_interval=None,
+    catchup=False,
+    description='Copia un archivo CSV desde local a HDFS y lee con Spark',
+) as dag:
+
+    upload_to_hdfs_via_ssh = SSHOperator(
+        task_id='upload_csv_hdfs_ssh',
+        ssh_conn_id='hadoop_sshb',
+        command="""
+            docker exec snp-dwh-hadoop-namenode-1 hdfs dfs -mkdir -p /data &&
+            docker exec snp-dwh-hadoop-namenode-1 hdfs dfs -put -f /sftp-data/usuarios.csv /data/
+        """
+    )
+
+    read_usuarios = SparkSubmitOperator(
+        task_id='read_usuarios_hdfs',
+        application='/opt/airflow/spark_jobs/read_hdfs_usuarios.py',
+        name='spark_read_usuarios_hdfs',
+        conn_id='spark_remote',
+        master="spark://snp-dwh-spark-master-1:7077",
+        conf={
+            "spark.driver.memory": "4g",
+            "spark.executor.memory": "4g",
+            "spark.executor.cores": "2",
+            "spark.default.parallelism": "100",
+        },
+        verbose=True,
+        jars=",".join(jars)
+    )
+
+    upload_to_hdfs_via_ssh >> read_usuarios
+🚀 ¡Con esto tu DAG aparecerá en Airflow, ejecutará el SSHOperator para cargar el archivo, y luego usará SparkSubmitOperator para correr en tu cluster Spark, con logs en la UI y en la consola!
+
+✅ ¿Quieres que te haga el docker-compose.yml con AIRFLOW_CONN_SPARK_REMOTE inyectado automáticamente para que no tengas que cargarlo en Admin → Connections?
+¡Solo dime y te lo preparo en segundos! 💪
+
+
+
+adoop-namenode-1 hdfs dfs -put -f /tmp/datos_pnd2425-13-05-2025_n.xlsx /data/
 rm /var/snp-dwh/sftp/sftp-data/datos_pnd2425-13-05-2025_n.xlsx
