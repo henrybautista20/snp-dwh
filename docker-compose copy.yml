@@ -1,8 +1,9 @@
+version: '3.8'
 
 services:
   postgres:
     profiles: ["node1"]
-    build: ./postgres 
+    build: ./postgres
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -38,8 +39,6 @@ services:
       - SPARK_MODE=worker
       - SPARK_MASTER_URL=spark://192.168.100.53:7077
       - SPARK_WORKER_HOST=192.168.100.53
-      - SPARK_WORKER_MEMORY=1g
-      - SPARK_WORKER_CORES=2
     depends_on:
       - spark-master
     ports:
@@ -58,8 +57,6 @@ services:
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT}/${POSTGRES_DB}
       - AIRFLOW__CORE__FERNET_KEY=${AIRFLOW_FERNET_KEY}
-      - AIRFLOW__CORE__LOAD_EXAMPLES=False
-      - AIRFLOW__DATABASE__SQL_ALCHEMY_POOL_ENABLED=False
     depends_on:
       - postgres
     ports:
@@ -81,9 +78,6 @@ services:
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT}/${POSTGRES_DB}
       - AIRFLOW__CORE__FERNET_KEY=${AIRFLOW_FERNET_KEY}
-      - AIRFLOW__CORE__LOAD_EXAMPLES=False
-      - AIRFLOW__DATABASE__SQL_ALCHEMY_POOL_ENABLED=False
-
     depends_on:
       - postgres
     volumes:

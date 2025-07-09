@@ -7,8 +7,7 @@ spark = SparkSession.builder \
     .getOrCreate()
 
 # Ruta HDFS del archivo
-hdfs_path = "hdfs://192.168.100.52:8020/data/usuarios.csv"
-
+hdfs_path = "hdfs://192.168.100.54:8020/data/usuarios.csv"
 # Nota: Asegúrate de que el nombre del nodo y el puerto coincidan con tu configuración de HDFS
 # Si estás usando un contenedor, puede que necesites usar la IP del contenedor en    jars="/var/snp-dwh/spark_jobs/jars/postgresql-42.7.3.jar" , #",".join(jars),
 

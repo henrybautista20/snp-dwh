@@ -32,20 +32,23 @@ with DAG(
         ssh_conn_id='hadoop_ssh',
         command="""
             docker exec snp-dwh-hadoop-namenode-1 hdfs dfs -mkdir -p /data &&
-            docker exec snp-dwh-hadoop-namenode-1 hdfs dfs -put -f /sftp-data/usuarios.csv /data/
+            docker exec snp-dwh-hadoop-namenode-1 hdfs dfs -put -f /sftp-data/usuarios.csv /data/ &&
+            docker exec snp-dwh-hadoop-namenode-1 hdfs dfs -chmod -R 777 /data/usuarios.csv
         """
     )
+    #docker exec snp-dwh-hadoop-namenode-1 hdfs dfs -mkdir -p /data &&
+    #        docker exec snp-dwh-hadoop-namenode-1 hdfs dfs -put -f /sftp-data/usuarios.csv /data/
 
     run_spark = SparkSubmitOperator(
         task_id='run_remote_spark_job',
           application='/opt/airflow/spark_jobs/mi_script2.py',
     conn_id='spark_remote',
     conf={
-            "spark.driver.memory": "4g",
-            "spark.executor.memory": "4g",
-            "spark.executor.cores": "2",
-            "spark.default.parallelism": "100",
-        },
+    "spark.driver.memory": "512m",
+    "spark.executor.memory": "1g",
+    "spark.executor.cores": "1",
+    "spark.default.parallelism": "10"
+},
         verbose=True,
    jars=",".join(jars)
     )
