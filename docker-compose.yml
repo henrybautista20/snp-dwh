@@ -11,8 +11,7 @@ services:
       - "${POSTGRES_PORT}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    networks:
-      - dev-net
+
 
 
   spark-master:
@@ -27,8 +26,7 @@ services:
     volumes:
       - ./spark/spark_jobs:/opt/spark-apps
       - ./spark/spark_jobs/jars:/opt/spark-apps/jars
-    networks:
-      - dev-net
+
 
 
   spark-worker:
@@ -36,10 +34,9 @@ services:
     profiles: ["node1"]
     environment:
       - SPARK_MODE=worker
-      - SPARK_MASTER_URL=spark://192.168.100.53:7077
-      - SPARK_WORKER_HOST=192.168.100.53
-      - SPARK_WORKER_MEMORY=1g
-      - SPARK_WORKER_CORES=2
+      - SPARK_MASTER_URL=spark://spark-master:7077
+      - SPARK_WORKER_MEMORY=4g
+      - SPARK_WORKER_CORES=4
     depends_on:
       - spark-master
     ports:
@@ -47,8 +44,7 @@ services:
     volumes:
       - ./spark/spark_jobs:/opt/spark-apps
       - ./spark/spark_jobs/jars:/opt/spark-apps/jars
-    networks:
-      - dev-net
+
 
 
   airflow-webserver:
@@ -69,8 +65,7 @@ services:
       - airflow_logs:/opt/airflow/logs
       - ./spark_jobs:/opt/airflow/spark_jobs
       - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      - dev-net
+
     command: webserver
 
 
@@ -91,8 +86,7 @@ services:
       - airflow_logs:/opt/airflow/logs
       - ./spark_jobs:/opt/airflow/spark_jobs
       - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      - dev-net
+
     command: scheduler
 
 
@@ -107,8 +101,7 @@ services:
     volumes:
       - hadoop_namenode:/hadoop/dfs/name
       - ./sftp/sftp-data:/sftp-data
-    networks:
-      - dev-net
+
 
 
   hadoop-datanode:
@@ -123,8 +116,7 @@ services:
       - ./sftp/sftp-data:/sftp-data
     depends_on:
       - hadoop-namenode
-    networks:
-      - dev-net
+
 
 
   sftp:
@@ -134,13 +126,10 @@ services:
       - "${SFTP_PORT}:22"
     volumes:
       - /var/snp-dwh/sftp/sftp-data:/home/urbadigital/upload
-    networks:
-      - dev-net
+
     command: urbadigital:password:1001
 
 
-networks:
-  dev-net:
 
 volumes:
   postgres_data:

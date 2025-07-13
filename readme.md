@@ -35,8 +35,7 @@ docker compose up -d airflow-webserver airflow-scheduler
 ## 🗄 3. Inicializar la base de datos de Airflow
 
 ```bash
-docker exec -it snp-dwh-airflow-webserver-1 airflow db init
-docker exec -it snp-dwh-airflow-scheduler-1 airflow db init
+docker exec -it snp-dwh-airflow-webserver-1 airflow db init && docker exec -it snp-dwh-airflow-scheduler-1 airflow db init
 ```
 docker compose --profile node1 up -d --build
  docker compose --profile node1 down -v
@@ -56,7 +55,7 @@ docker exec -it snp-dwh-airflow-webserver-1 airflow users create \
   --role Admin \
   --email admin@example.com
 ```
-docker compose --profile node1 up -d --build
+docker compose --profile node2 up -d --build
 docker compose --profile node2 down -v
 ---
 docker exec -u root -it snp-dwh-spark-master-1 bash
@@ -75,7 +74,7 @@ docker exec -it snp-dwh-airflow-webserver-1 \
 docker exec -it snp-dwh-airflow-webserver-1 \
   airflow connections add hadoop_ssh \
     --conn-type ssh \
-    --conn-host 192.168.100.54 \
+    --conn-host 192.168.1.141 \
     --conn-login root \
     --conn-password 1234
 ```

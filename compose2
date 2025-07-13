@@ -1,0 +1,42 @@
+services:
+  hadoop-namenode:
+    image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
+    container_name: hadoop-namenode
+    network_mode: host
+    environment:
+      - CLUSTER_NAME=dev-hadoop
+      - CORE_CONF_fs_defaultFS=hdfs://192.168.1.141:8020
+      - CORE_CONF_hadoop_http_staticuser_user=root
+    volumes:
+      - hadoop_namenode:/hadoop/dfs/name
+      - ./sftp/sftp-data:/sftp-data
+
+  hadoop-datanode:
+    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+    container_name: hadoop-datanode
+    network_mode: host
+    depends_on:
+      - hadoop-namenode
+    environment:
+      - CORE_CONF_fs_defaultFS=hdfs://192.168.1.141:8020
+      - CORE_CONF_hadoop_http_staticuser_user=root
+      - HDFS_CONF_dfs_replication=1
+      - HDFS_CONF_dfs_datanode_hostname=192.168.1.141
+      - HDFS_CONF_dfs_datanode_use_datanode_hostname=true
+      - HDFS_CONF_dfs_client_use_datanode_hostname=true
+    volumes:
+      - hadoop_datanode:/hadoop/dfs/data
+      - ./sftp/sftp-data:/sftp-data
+
+  sftp:
+    image: atmoz/sftp
+    container_name: sftp
+    ports:
+      - "2222:22"
+    volumes:
+      - ./sftp/sftp-data:/home/urbadigital/upload
+    command: urbadigital:password:1001
+
+volumes:
+  hadoop_namenode:
+  hadoop_datanode:
