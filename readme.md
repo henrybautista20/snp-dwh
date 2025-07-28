@@ -35,7 +35,7 @@ docker compose up -d airflow-webserver airflow-scheduler
 ## 🗄 3. Inicializar la base de datos de Airflow
 
 ```bash
-docker exec -it snp-dwh-airflow-webserver-1 airflow db init && docker exec -it snp-dwh-airflow-scheduler-1 airflow db init
+docker exec -it snp-dwh-airflow-webserver airflow db init && docker exec -it snp-dwh-airflow-scheduler airflow db init
 ```
 docker compose --profile node1 up -d --build
  docker compose --profile node1 down -v
@@ -47,7 +47,7 @@ docker exec -u root -it snp-dwh-spark-1 bash
 ## 👤 4. Crear el usuario administrador de Airflow
 
 ```bash
-docker exec -it snp-dwh-airflow-webserver-1 airflow users create \
+docker exec -it snp-dwh-airflow-webserver airflow users create \
   --username admin \
   --password admin \
   --firstname Admin \
@@ -65,16 +65,16 @@ docker exec -u root -it snp-dwh-spark-master-1 bash
 Crea la conexión `spark_remote` apuntando a tu master Spark en `spark://snp-dwh-spark-master-1:7077`:
 
 ```bash
-docker exec -it snp-dwh-airflow-webserver-1 \
+docker exec -it snp-dwh-airflow-webserver \
   airflow connections add spark_remote \
     --conn-type spark \
-    --conn-host spark://snp-dwh-spark-master-1 \
+    --conn-host spark://snp-dwh-spark-master \
     --conn-port 7077
 
-docker exec -it snp-dwh-airflow-webserver-1 \
+docker exec -it snp-dwh-airflow-webserver \
   airflow connections add hadoop_ssh \
     --conn-type ssh \
-    --conn-host 192.168.1.141 \
+    --conn-host 127.0.0.1 \
     --conn-login root \
     --conn-password 1234
 ```

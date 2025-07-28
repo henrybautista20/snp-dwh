@@ -27,24 +27,15 @@ with DAG(
     description='Copia usuarios.csv desde /sftp-data en el contenedor hadoop-namenode a HDFS /data',
 ) as dag:
 
-    upload_to_hdfs_via_ssh = SSHOperator(
-        task_id='upload_csv_hdfs_ssh',
-        ssh_conn_id='hadoop_ssh',
-        command="""
-            docker exec hadoop-namenode hdfs dfs -mkdir -p /data &&
-            docker exec hadoop-namenode hdfs dfs -put -f /sftp-data/usuarios.csv /data/ &&
-            docker exec hadoop-namenode hdfs dfs -chmod -R 777 /data/usuarios.csv
-        """
+    create_hdfs_folder = BashOperator(
+        task_id='create_hdfs_folder',
+        bash_command='docker exec hadoop-namenode hdfs dfs -mkdir -p /data',
+    )
+
+    upload_csv_to_hdfs = BashOperator(
+        task_id='upload_csv_to_hdfs',
+        bash_command='docker exec hadoop-namenode hdfs dfs -put -f /sftp-data/usuarios.csv /data/',
     )
     #docker exec snp-dwh-hadoop-namenode-1 hdfs dfs -mkdir -p /data &&
     #        docker exec snp-dwh-hadoop-namenode-1 hdfs dfs -put -f /sftp-data/usuarios.csv /data/
-
-    run_spark = SparkSubmitOperator(
-        task_id='run_remote_spark_job',
-          application='/opt/airflow/spark_jobs/mi_script2.py',
-    conn_id='spark_remote',
-    
-    verbose=True,
-   jars=",".join(jars)
-    )
-    upload_to_hdfs_via_ssh >> run_spark
+    create_hdfs_folder >> upload_csv_to_hdfs

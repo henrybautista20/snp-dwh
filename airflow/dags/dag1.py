@@ -1,6 +1,24 @@
 from airflow import DAG
-from airflow.operators.bash import BashOperator
+from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
 from datetime import datetime
 
-with DAG('test_dag_minimo', start_date=datetime(2024,1,1), schedule_interval=None) as dag:
-    t = BashOperator(task_id='hola', bash_command='echo hi')
+default_args = {
+    'owner': 'airflow',
+    'start_date': datetime(2024, 1, 1),
+}
+
+with DAG(
+    dag_id='dag1',
+    default_args=default_args,
+    schedule_interval=None,
+    catchup=False,
+    tags=['spark'],
+) as dag:
+
+    run_spark = SparkSubmitOperator(
+        task_id='run_remote_spark_job',
+        application='/opt/airflow/spark_jobs/saludo_spark.py',  
+        conn_id='spark_remote',
+        verbose=True
+    )
+    

@@ -1,135 +1,197 @@
 
 services:
+  # ----------------------
+  # PostgreSQL
+  # ----------------------
   postgres:
+    image: postgres:14
     profiles: ["node1"]
-    build: ./postgres 
+    container_name: snp-dwh-postgres
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-    ports:
-      - "${POSTGRES_PORT}:5432"
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U airflow"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-
-
+  # ----------------------
+  # Spark master
+  # ----------------------
   spark-master:
-    build: ./spark
+    container_name: snp-dwh-spark-master
     profiles: ["node1"]
+    build: ./spark
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
       - SPARK_MODE=master
-      - SPARK_MASTER_PORT=${SPARK_MASTER_PORT}
+      - SPARK_MASTER_PORT=7077
     ports:
-      - "${SPARK_UI_PORT}:8080"
-      - "${SPARK_MASTER_PORT}:7077"
+      - "8080:8080"
+      - "7077:7077"
     volumes:
       - ./spark/spark_jobs:/opt/spark-apps
       - ./spark/spark_jobs/jars:/opt/spark-apps/jars
 
-
-
+  # ----------------------
+  # Spark worker
+  # ----------------------
   spark-worker:
-    build: ./spark
+    container_name: snp-dwh-spark-worker
     profiles: ["node1"]
+    build: ./spark
     environment:
       - SPARK_MODE=worker
       - SPARK_MASTER_URL=spark://spark-master:7077
-      - SPARK_WORKER_MEMORY=4g
-      - SPARK_WORKER_CORES=4
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       - spark-master
     ports:
-      - "${SPARK_WORKER_UI_PORT}:8081"
+      - "8081:8081"
     volumes:
       - ./spark/spark_jobs:/opt/spark-apps
       - ./spark/spark_jobs/jars:/opt/spark-apps/jars
 
+  # ----------------------
+  # Airflow Init
+  # ----------------------
+  airflow-init:
+    build: ./airflow
+    profiles: ["node1"]
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      - AIRFLOW__CORE__FERNET_KEY=VmGZmplT2scTE2VQGpOb4qiGDA-37G1J9RldbdjOYSA=
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_POOL_ENABLED=False
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - airflow_logs:/opt/airflow/logs
+      - ./spark_jobs:/opt/airflow/spark_jobs
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: >
+      bash -c "
+        if airflow db check > /dev/null 2>&1; then
+          echo 'La base de datos ya está inicializada, ejecutando upgrade...';
+          airflow db upgrade;
+        else
+          echo 'Inicializando la base de datos...';
+          airflow db init;
+        fi
+      "
+    healthcheck:
+      test: ["CMD-SHELL", "airflow db check || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-
+  # ----------------------
+  # Airflow Webserver
+  # ----------------------
   airflow-webserver:
-    build: ./airflow
+    container_name: snp-dwh-airflow-webserver
     profiles: ["node1"]
+    build: ./airflow
     environment:
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
-      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT}/${POSTGRES_DB}
-      - AIRFLOW__CORE__FERNET_KEY=${AIRFLOW_FERNET_KEY}
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      - AIRFLOW__CORE__FERNET_KEY=VmGZmplT2scTE2VQGpOb4qiGDA-37G1J9RldbdjOYSA=
       - AIRFLOW__CORE__LOAD_EXAMPLES=False
       - AIRFLOW__DATABASE__SQL_ALCHEMY_POOL_ENABLED=False
     depends_on:
-      - postgres
+      - airflow-init
     ports:
-      - "${AIRFLOW_WEB_PORT}:8080"
+      - "8082:8080"
     volumes:
       - ./airflow/dags:/opt/airflow/dags
       - airflow_logs:/opt/airflow/logs
       - ./spark_jobs:/opt/airflow/spark_jobs
       - /var/run/docker.sock:/var/run/docker.sock
+    command: >
+      bash -c "airflow webserver"
 
-    command: webserver
-
-
+  # ----------------------
+  # Airflow Scheduler
+  # ----------------------
   airflow-scheduler:
-    build: ./airflow
+    container_name: snp-dwh-airflow-scheduler
     profiles: ["node1"]
+    build: ./airflow
     environment:
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
-      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT}/${POSTGRES_DB}
-      - AIRFLOW__CORE__FERNET_KEY=${AIRFLOW_FERNET_KEY}
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      - AIRFLOW__CORE__FERNET_KEY=VmGZmplT2scTE2VQGpOb4qiGDA-37G1J9RldbdjOYSA=
       - AIRFLOW__CORE__LOAD_EXAMPLES=False
       - AIRFLOW__DATABASE__SQL_ALCHEMY_POOL_ENABLED=False
-
     depends_on:
-      - postgres
+      - airflow-init
+      - airflow-webserver
     volumes:
       - ./airflow/dags:/opt/airflow/dags
       - airflow_logs:/opt/airflow/logs
       - ./spark_jobs:/opt/airflow/spark_jobs
       - /var/run/docker.sock:/var/run/docker.sock
+    command: >
+      bash -c "airflow scheduler"
 
-    command: scheduler
-
-
+  # ----------------------
+  # Hadoop Namenode
+  # ----------------------
   hadoop-namenode:
     image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
-    profiles: ["node2"]
+    profiles: ["node1"]
+    container_name: hadoop-namenode
     environment:
       - CLUSTER_NAME=dev-hadoop
-    ports:
-      - "${HADOOP_NAMENODE_HTTP_PORT}:9870"
-      - "${HADOOP_NAMENODE_RPC_PORT}:8020"
+      - CORE_CONF_fs_defaultFS=hdfs://hadoop-namenode:8020
+      - CORE_CONF_hadoop_http_staticuser_user=root
     volumes:
       - hadoop_namenode:/hadoop/dfs/name
       - ./sftp/sftp-data:/sftp-data
 
-
-
+  # ----------------------
+  # Hadoop Datanode
+  # ----------------------
   hadoop-datanode:
     image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
-    profiles: ["node2"]
-    environment:
-      - CORE_CONF_fs_defaultFS=hdfs://hadoop-namenode:${HADOOP_NAMENODE_RPC_PORT}
-      - CORE_CONF_hadoop_http_staticuser_user=root
-      - HDFS_CONF_dfs_replication=1
-    volumes:
-      - hadoop_namenode:/hadoop/dfs/name
-      - ./sftp/sftp-data:/sftp-data
+    profiles: ["node1"]
+    container_name: hadoop-datanode
     depends_on:
       - hadoop-namenode
+    environment:
+      - CORE_CONF_fs_defaultFS=hdfs://hadoop-namenode:8020
+      - CORE_CONF_hadoop_http_staticuser_user=root
+      - HDFS_CONF_dfs_replication=1
+      - HDFS_CONF_dfs_datanode_hostname=hadoop-datanode
+      - HDFS_CONF_dfs_datanode_use_datanode_hostname=false
+      - HDFS_CONF_dfs_client_use_datanode_hostname=false
+    volumes:
+      - hadoop_datanode:/hadoop/dfs/data
+      - ./sftp/sftp-data:/sftp-data
 
-
-
+  # ----------------------
+  # SFTP
+  # ----------------------
   sftp:
     image: atmoz/sftp
-    profiles: ["node2"]
+    profiles: ["node1"]
+    container_name: sftp
     ports:
-      - "${SFTP_PORT}:22"
+      - "2222:22"
     volumes:
-      - /var/snp-dwh/sftp/sftp-data:/home/urbadigital/upload
-
+      - ./sftp/sftp-data:/home/urbadigital/upload
     command: urbadigital:password:1001
-
-
 
 volumes:
   postgres_data:
