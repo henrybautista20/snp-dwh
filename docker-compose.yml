@@ -174,6 +174,9 @@ services:
   hadoop-namenode:
     image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
     profiles: ["node1"]
+    ports:
+      - "9870:9870"
+      - "8020:8020"
     container_name: hadoop-namenode
     environment:
       - CLUSTER_NAME=dev-hadoop
