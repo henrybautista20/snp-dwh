@@ -8,7 +8,7 @@ Airflow necesita una clave Fernet para cifrar datos sensibles.
 python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
 ```
 
-> Copia el resultado y configúralo en tu `docker-compose.yml` bajo:
+> Copia el resultado y configúralo en tu `docker-compose.yml` bajo en todos los servicios:
 >
 > ```yaml
 > environment:
@@ -18,7 +18,8 @@ python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().
 ---
 corre
 ```
-> docker compose up -d 
+> docker compose --profile node1 up -d
+ docker compose --profile node1 down -v
 ---
 
 
@@ -32,13 +33,12 @@ docker compose up -d airflow-webserver airflow-scheduler
 
 ---
 
-## 🗄 3. Inicializar la base de datos de Airflow
+## 🗄 3. Inicializar la base de datos de Airflow si docker no sirve
 
 ```bash
 docker exec -it snp-dwh-airflow-webserver airflow db init && docker exec -it snp-dwh-airflow-scheduler airflow db init
 ```
-docker compose --profile node1 up -d --build
- docker compose --profile node1 down -v
+
 ---
 
 docker exec -u root -it snp-dwh-spark-1 bash
@@ -55,10 +55,8 @@ docker exec -it snp-dwh-airflow-webserver airflow users create \
   --role Admin \
   --email admin@example.com
 ```
-docker compose --profile node2 up -d --build
-docker compose --profile node2 down -v
+
 ---
-docker exec -u root -it snp-dwh-spark-master-1 bash
 
 ## 🔗 5. Crear la conexión a Spark
 
@@ -77,11 +75,15 @@ docker exec -it snp-dwh-airflow-webserver \
     --conn-host 127.0.0.1 \
     --conn-login root \
     --conn-password 1234
+
+# Si queremos iniciar 
+docker exec -it snp-dwh-airflow-webserver 
+
 ```
-docker exec -it snp-dwh-airflow-webserver-1 
+
 ---
 
-## 📥 6. Descargar el driver JDBC de PostgreSQL
+## IGNORAR ...📥 6. Descargar el driver JDBC de PostgreSQL
 
 ```bash
 wget https://jdbc.postgresql.org/download/postgresql-42.7.3.jar
@@ -94,14 +96,17 @@ wget https://jdbc.postgresql.org/download/postgresql-42.7.3.jar
 Crear directorios en los contenedores:
 
 ```bash
-docker exec -it snp-dwh-airflow-webserver-1 bash -c "mkdir -p /opt/airflow/jars"
+docker exec -it snp-dwh-airflow-webserver bash -c "mkdir -p /opt/airflow/jars"
 docker exec -it snp-dwh-airflow-scheduler-1 bash -c "mkdir -p /opt/airflow/jars"
 ```
+
+
+
 
 Copiar el driver:
 
 ```bash
-docker cp postgresql-42.7.3.jar snp-dwh-airflow-webserver-1:/opt/airflow/jars/postgresql-42.7.3.jar
+docker cp postgresql-42.7.3.jar snp-dwh-airflow-webserver:/opt/airflow/jars/postgresql-42.7.3.jar
 docker cp postgresql-42.7.3.jar snp-dwh-airflow-scheduler-1:/opt/airflow/jars/postgresql-42.7.3.jar
 ```
 
