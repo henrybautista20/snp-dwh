@@ -171,16 +171,16 @@ services:
   # ----------------------
   # Hadoop Namenode
   # ----------------------
-  hadoop-namenode:
+  snp-dwh-hadoop-namenode-1:
     image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
     profiles: ["node1"]
     ports:
       - "9870:9870"
       - "8020:8020"
-    container_name: hadoop-namenode
+    container_name: snp-dwh-hadoop-namenode-1
     environment:
       - CLUSTER_NAME=dev-hadoop
-      - CORE_CONF_fs_defaultFS=hdfs://hadoop-namenode:8020
+      - CORE_CONF_fs_defaultFS=hdfs://snp-dwh-hadoop-namenode-1:8020
       - CORE_CONF_hadoop_http_staticuser_user=root
     volumes:
       - hadoop_namenode:/hadoop/dfs/name
@@ -189,17 +189,17 @@ services:
   # ----------------------
   # Hadoop Datanode
   # ----------------------
-  hadoop-datanode:
+  snp-dwh-hadoop-datanode-1:
     image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
     profiles: ["node1"]
-    container_name: hadoop-datanode
+    container_name: snp-dwh-hadoop-datanode-1
     depends_on:
-      - hadoop-namenode
+      - snp-dwh-hadoop-namenode-1
     environment:
-      - CORE_CONF_fs_defaultFS=hdfs://hadoop-namenode:8020
+      - CORE_CONF_fs_defaultFS=hdfs://snp-dwh-hadoop-namenode-1:8020
       - CORE_CONF_hadoop_http_staticuser_user=root
       - HDFS_CONF_dfs_replication=1
-      - HDFS_CONF_dfs_datanode_hostname=hadoop-datanode
+      - HDFS_CONF_dfs_datanode_hostname=snp-dwh-hadoop-datanode-1
       - HDFS_CONF_dfs_datanode_use_datanode_hostname=false
       - HDFS_CONF_dfs_client_use_datanode_hostname=false
     volumes:

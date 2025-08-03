@@ -37,7 +37,7 @@ with DAG(
 
     run_spark = SparkSubmitOperator(
         task_id='run_remote_spark_job',
-          application='/opt/airflow/spark_jobs/force.py',
+          application='/opt/airflow/spark_jobs/sftp_hadoop_spark_db.py',
     conn_id='spark_remote',
     conf={
             "spark.driver.memory": "4g",
@@ -45,7 +45,7 @@ with DAG(
             "spark.executor.cores": "2",
             "spark.default.parallelism": "100",
         },
-        verbose=True,
+        verbose=True, 
    jars=",".join(jars)
     )
     create_hdfs_folder >> upload_csv_to_hdfs >> run_spark

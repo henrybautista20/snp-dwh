@@ -18,7 +18,7 @@ except PermissionError:
     print("❌ No tienes permisos para leer este archivo.")
     exit(1)
 except Exception as e:
-    print(f"⚠️ Error al leer el archivo: {e}")
+    print(f"⚠️ Error al leer el archivo: {e}") 
     exit(1)
 
 # === 2. Crear sesión Spark ===

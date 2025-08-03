@@ -52,7 +52,7 @@ spark = SparkSession.builder \
     .getOrCreate()
 
 # Ruta en HDFS (ajusta si cambias el archivo)
-hdfs_path = "hdfs://192.168.1.137:8020/data/datos_pnd2425-13-05-2025_n.xlsx"
+hdfs_path = "hdfs://192.168.1.144:8020/data/datos_pnd2425-13-05-2025_n.xlsx"
 
 # Leer usando dataAddress para empezar desde la fila 3
 df = spark.read.format("com.crealytics.spark.excel") \

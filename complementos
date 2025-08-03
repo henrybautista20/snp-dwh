@@ -62,7 +62,7 @@ docker exec -it snp-dwh-airflow-webserver-1 airflow connections add \
   --conn_port 7077
 
 3 descarfa
-wget https://jdbc.postgresql.org/download/postgresql-42.7.3.jar
+wget https://jdbc.postgresql.org/download/spark-excel_2.12-3.5.1_0.20.4.jar
 docker exec -it snp-dwh-airflow-webserver-1 bash
 mkdir -p /opt/airflow/jars
 

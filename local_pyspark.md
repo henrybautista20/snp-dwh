@@ -1,0 +1,1 @@
+in vs code use control + shif + v and search virtual enviropmen python
