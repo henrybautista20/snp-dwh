@@ -67,7 +67,7 @@ services:
   # ----------------------
   spark-worker-2:
     container_name: snp-dwh-spark-worker-2
-    profiles: ["node1"]
+    profiles: ["node2"]
     build: ./spark
     environment:
       - SPARK_MODE=worker

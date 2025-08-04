@@ -2,3 +2,4 @@
 .venv*
 airflow/dags/__pycache__/*
 sftp/output/*
+localtest/cheakpoint/*
