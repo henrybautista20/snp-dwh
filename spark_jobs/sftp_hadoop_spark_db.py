@@ -66,11 +66,11 @@ df.show(5, truncate=False)
 df.write \
     .format("jdbc") \
     .option("url", "jdbc:postgresql://postgres:5432/usuario_db") \
-    .option("dbtable", "usuario_spark2") \
+    .option("dbtable", "datos_pnd2425_spark2") \
     .option("user", "airflow") \
     .option("password", "airflow") \
     .option("driver", "org.postgresql.Driver") \
-    .mode("append") \
+    .mode("overwrite") \
     .save()
 
 print("✅ Registros insertados exitosamente en usuario_spark.")
