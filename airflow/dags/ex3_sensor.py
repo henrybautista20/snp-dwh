@@ -12,4 +12,4 @@ with DAG('example_file_sensor',
         filepath='/opt/airflow/dags/usuarios.csv',
         poke_interval=30,    # revisa cada 30 segundos
         timeout=600          # tiempo máximo de espera: 10 minutos
-    )
+    ) 

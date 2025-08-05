@@ -21,7 +21,6 @@ with DAG(
     dag_id='etl_sftp_hadoop_spark_db',
     default_args=default_args,
     schedule_interval=None,  # Manual o lo puedes poner diario, '0 6 * * *'
-    catchup=False,
     description='Copia usuarios.csv desde /sftp-data en el contenedor hadoop-namenode a HDFS /data',
 ) as dag:
 

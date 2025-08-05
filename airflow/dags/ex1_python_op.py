@@ -3,7 +3,7 @@ from airflow.operators.python import PythonOperator
 from datetime import datetime
 
 def my_python_task():
-    print("Hola desde PythonOperator!")
+    print("Hola desde PythonOperator! 3")
 
 with DAG('example_python_operator',
          start_date=datetime(2025, 8, 5),
